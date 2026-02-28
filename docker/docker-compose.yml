@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  # PostgreSQL with pgvector for RAG
+  postgres:
+    image: pgvector/pgvector:pg15-latest
+    container_name: postgres_vectordb
+    environment:
+      POSTGRES_DB: rag_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ollama_data:
+  postgres_data:

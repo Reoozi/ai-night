@@ -6,14 +6,15 @@ Challenge Requirements:
 - Input: User question (text)
 - Processing: Generate embedding with all-MiniLM-L6-v2, search with cosine similarity
 - Output: Top 3 results with text fragment and similarity score (2 decimals)
-- Database: PostgreSQL with pgvector, table='embeddings'
+- Database: ChromaDB (local vector database), collection='embeddings'
 
 Constraints:
 ✓ Model: all-MiniLM-L6-v2 (sentence-transformers)
 ✓ Dimension: 384
-✓ Similarity: Cosine Similarity (pgvector <=> operator)
+✓ Similarity: Cosine Similarity
 ✓ Top K: 3 results
 ✓ Language: Python
+✓ No Docker Required!
 """
 
 import sys
@@ -23,7 +24,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'app'))
 
 from services.embedding_service import EmbeddingService
-from services.pgvector_store import PgVectorStore
+from services.chroma_store import ChromaVectorStore
 from utils.logger import logger
 from core.config import settings
 
@@ -39,8 +40,8 @@ class BakeryRAGSearch:
             # Initialize embedding service (all-MiniLM-L6-v2)
             self.embeddings = EmbeddingService(model_name="all-MiniLM-L6-v2")
             
-            # Initialize pgvector store
-            self.vector_store = PgVectorStore()
+            # Initialize ChromaDB store (no Docker needed!)
+            self.vector_store = ChromaVectorStore()
             
             # Verify constraints
             assert self.embeddings.embedding_dim == 384, "Embedding dimension must be 384"

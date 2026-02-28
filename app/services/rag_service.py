@@ -1,7 +1,7 @@
 """RAG (Retrieval Augmented Generation) service."""
 from services.document_splitter import document_splitter
 from services.embedding_service import embedding_service
-from services.pgvector_store import pgvector_store
+from services.chroma_store import chroma_store
 from services.reranker import reranker
 from utils.logger import logger
 from typing import List, Dict, Optional
@@ -33,16 +33,16 @@ class RAGService:
             embeddings = embedding_service.embed_batch(contents)
             logger.info(f"Generated {len(embeddings)} embeddings")
             
-            # Step 3: Store in pgvector
-            doc_ids = pgvector_store.add_documents(chunks, embeddings)
-            logger.info(f"Stored {len(doc_ids)} documents in pgvector")
+            # Step 3: Store in ChromaDB
+            doc_ids = chroma_store.add_documents(chunks, embeddings)
+            logger.info(f"Stored {len(doc_ids)} documents in ChromaDB")
             
             return {
                 "status": "success",
                 "total_documents": len(documents),
                 "total_chunks": len(chunks),
                 "total_embeddings": len(embeddings),
-                "document_count_in_db": pgvector_store.get_document_count()
+                "document_count_in_db": chroma_store.get_document_count()
             }
             
         except Exception as e:
@@ -78,8 +78,8 @@ class RAGService:
             query_embedding = embedding_service.embed(query)
             logger.info("Query embedding generated")
             
-            # Step 2: Search in pgvector
-            initial_results = pgvector_store.search(query_embedding, top_k=top_k)
+            # Step 2: Search in ChromaDB
+            initial_results = chroma_store.search(query_embedding, top_k=top_k)
             logger.info(f"Found {len(initial_results)} initial results")
             
             # Step 3: Rerank if requested
@@ -107,10 +107,10 @@ class RAGService:
     def clear_database(self) -> Dict:
         """Clear all indexed documents from database. Use with caution!"""
         try:
-            pgvector_store.delete_all_documents()
+            chroma_store.delete_all_documents()
             return {
                 "status": "success",
-                "message": "All documents have been cleared from the database"
+                "message": "All documents have been cleared from ChromaDB"
             }
         except Exception as e:
             logger.error(f"Error clearing database: {str(e)}")
@@ -122,7 +122,7 @@ class RAGService:
     def get_stats(self) -> Dict:
         """Get RAG system statistics."""
         return {
-            "total_documents": pgvector_store.get_document_count(),
+            "total_documents": chroma_store.get_document_count(),
             "embedding_model": embedding_service.model_name,
             "embedding_dimension": embedding_service.embedding_dim,
             "reranker_model": reranker.model_name

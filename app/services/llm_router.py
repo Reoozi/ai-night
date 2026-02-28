@@ -50,13 +50,9 @@ Please answer the question based on the context provided above."""
             augmented_prompt = prompt
         
         # Route to appropriate LLM service
-        if model in ["ollama", "ragwithollama"]:
-            logger.info("Using Ollama LLM")
-            # TODO: Implement ollama_service if needed
-            response = await nvidia_services.ask(augmented_prompt)
-        else:
-            logger.info("Using NVIDIA API")
-            response = await nvidia_services.ask(augmented_prompt)
+        # Currently using NVIDIA API for all models
+        logger.info(f"Using NVIDIA API for model: {model}")
+        response = await nvidia_services.ask(augmented_prompt)
         
         return response
         

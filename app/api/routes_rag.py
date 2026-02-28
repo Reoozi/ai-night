@@ -18,7 +18,7 @@ async def index_documents(request: IndexDocumentsRequest):
     """Index documents for semantic search.
     
     This endpoint accepts a list of documents, splits them into chunks,
-    generates embeddings, and stores them in pgvector for semantic search.
+    generates embeddings, and stores them in ChromaDB for semantic search.
     """
     try:
         # Convert Pydantic models to dicts
